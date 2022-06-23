@@ -1,0 +1,593 @@
+import 'package:adaptive_layout_api/adaptive_layout.dart';
+import 'package:adaptive_layout_api/slot_layout.dart';
+import 'package:adaptive_layout_api/slot_layout_config.dart';
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.deepPurple,
+      ),
+      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+    );
+  }
+}
+
+class ContextInformation extends InheritedWidget {
+  const ContextInformation({
+    Key? key,
+    required this.selected,
+    required this.displayed,
+    required Widget child,
+  }) : super(key: key, child: child);
+
+  final int? selected;
+  final bool displayed;
+
+  static ContextInformation of(BuildContext context) {
+    final ContextInformation? result = context.dependOnInheritedWidgetOfExactType<ContextInformation>();
+    assert(result != null, 'No ContextInformation found in context');
+    return result!;
+  }
+
+  @override
+  bool updateShouldNotify(ContextInformation oldWidget) => selected != oldWidget.selected || displayed != displayed;
+}
+
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key, required this.title});
+
+  final String title;
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
+  int? selected;
+  void selectCard(int? index) {
+    setState(() {
+      selected = index;
+    });
+  }
+
+  bool displayed = false;
+  void setDisplayed(bool display) {
+    setState(() {
+      displayed = display;
+    });
+  }
+
+  late AnimationController _controller;
+  AnimatedWidget bottomToTop(controller, child) {
+    return SlideTransition(
+      position: Tween<Offset>(
+        begin: const Offset(0, 1),
+        end: Offset.zero,
+      ).animate(CurvedAnimation(parent: controller, curve: Curves.easeInOutCubic)),
+      child: child,
+    );
+  }
+
+  AnimatedWidget leftOutIn(controller, child) {
+    return SlideTransition(
+      position: Tween<Offset>(
+        begin: const Offset(-1, 0),
+        end: Offset.zero,
+      ).animate(controller),
+      child: child,
+    );
+  }
+
+  AnimatedWidget rightOutIn(AnimationController controller, Widget child) {
+    return SlideTransition(
+      position: Tween<Offset>(
+        begin: const Offset(1, 0),
+        end: Offset.zero,
+      ).animate(CurvedAnimation(parent: controller, curve: Curves.easeInOutCubic)),
+      child: child,
+    );
+  }
+
+  Widget sizeIn(AnimationController controller, Widget child) {
+    return ScaleTransition(scale: CurvedAnimation(parent: controller, curve: Curves.easeInOutCubic), child: child);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 1),
+      vsync: this,
+    )..forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 236, 235, 243),
+      body: SafeArea(
+        child: ContextInformation(
+          selected: selected,
+          displayed: displayed,
+          child: AdaptiveLayout(
+            leftNavigation: SlotLayout(
+              config: {
+                800: SlotLayoutConfig(
+                  key: const Key('leftNavigation'),
+                  animation: leftOutIn,
+                  child: SizedBox(
+                    width: 75,
+                    height: MediaQuery.of(context).size.height,
+                    child: NavigationRail(
+                      leading: Container(
+                        decoration: BoxDecoration(
+                          color: const Color.fromARGB(255, 254, 215, 227),
+                          borderRadius: const BorderRadius.all(Radius.circular(15)),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              spreadRadius: 1,
+                              blurRadius: 2,
+                              offset: const Offset(0, 2), // changes position of shadow
+                            ),
+                          ],
+                        ),
+                        width: 50,
+                        height: 50,
+                        child: const Icon(Icons.edit_outlined),
+                      ),
+                      backgroundColor: const Color.fromARGB(0, 255, 255, 255),
+                      labelType: NavigationRailLabelType.none,
+                      selectedIndex: 0,
+                      destinations: const [
+                        NavigationRailDestination(icon: Icon(Icons.inbox), label: Text('Inbox')),
+                        NavigationRailDestination(icon: Icon(Icons.article_outlined), label: Text('Articles')),
+                        NavigationRailDestination(icon: Icon(Icons.chat_bubble_outline), label: Text('Chat')),
+                        NavigationRailDestination(icon: Icon(Icons.video_call_outlined), label: Text('Video')),
+                      ],
+                    ),
+                  ),
+                ),
+                1000: SlotLayoutConfig(
+                  key: const Key('leftNavigation1'),
+                  animation: leftOutIn,
+                  child: SizedBox(
+                    width: 200,
+                    height: MediaQuery.of(context).size.height,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: NavigationRail(
+                        leading: Padding(
+                          padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
+                          child: Container(
+                            alignment: Alignment.centerLeft,
+                              decoration: BoxDecoration(
+                                color: const Color.fromARGB(255, 255, 225, 231),
+                                borderRadius: const BorderRadius.all(Radius.circular(15)),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.5),
+                                    spreadRadius: 1,
+                                    blurRadius: 2,
+                                    offset: const Offset(0, 2), // changes position of shadow
+                                  ),
+                                ],
+                              ),
+                              width: 200,
+                              height: 50,
+                              child: Padding(
+                                padding: const EdgeInsets.fromLTRB(16.0,0,0,0),
+                                child: Row(
+                                  children: const [
+                                    Icon(Icons.edit_outlined),
+                                    SizedBox(width: 20),
+                                    Center(child:Text('Compose')),
+                                  ],
+                                ),
+                              ),
+                          ),
+                        ),
+                        backgroundColor: const Color.fromARGB(0, 255, 255, 255),
+                        labelType: NavigationRailLabelType.none,
+                        selectedIndex: 0,
+                        extended: true,
+                        destinations: const [
+                          NavigationRailDestination(icon: Icon(Icons.inbox), label: Text('Inbox')),
+                          NavigationRailDestination(icon: Icon(Icons.article_outlined), label: Text('Articles')),
+                          NavigationRailDestination(icon: Icon(Icons.chat_bubble_outline), label: Text('Chat')),
+                          NavigationRailDestination(icon: Icon(Icons.video_call_outlined), label: Text('Video')),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              },
+            ),
+            body: SlotLayout(
+              config: {
+                0: SlotLayoutConfig(
+                  key: const Key('body'),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(32, 32, 32, 0),
+                    child: ItemList(items: allItems, selectCard: selectCard, setDisplayed: setDisplayed, showGridView: false),
+                  ),
+                ),
+                800: SlotLayoutConfig(
+                  key: const Key('body1'),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 32, 0, 0),
+                    child: ItemList(items: allItems, selectCard: selectCard, setDisplayed: setDisplayed, showGridView: true),
+                  ),
+                ),
+              },
+            ),
+            bodyLeft: SlotLayout(
+              config: {
+                800: SlotLayoutConfig(
+                  key: const Key('bodyLeft'),
+                  child: DetailTile(
+                    item: allItems[selected ?? 0],
+                  ),
+                ),
+              },
+            ),
+            bottomNavigation: SlotLayout(
+              config: {
+                0: SlotLayoutConfig(
+                  key: const Key('botnav'),
+                  animation: bottomToTop,
+                  child: BottomNavigationBar(
+                    selectedItemColor: Colors.black,
+                    backgroundColor: const Color.fromARGB(0, 0, 0, 0),
+                    items: const [
+                      BottomNavigationBarItem(label: 'Inbox', icon: Icon(Icons.inbox, color: Colors.black)),
+                      BottomNavigationBarItem(label: 'Articles', icon: Icon(Icons.article_outlined, color: Colors.black)),
+                      BottomNavigationBarItem(label: 'Chat', icon: Icon(Icons.chat_bubble_outline, color: Colors.black)),
+                      BottomNavigationBarItem(label: 'Video', icon: Icon(Icons.video_call_outlined, color: Colors.black)),
+                    ],
+                  ),
+                ),
+                800: SlotLayoutConfig(
+                  key: const Key('botnav1'),
+                  child: const SizedBox(
+                    height: 0,
+                    width: 0,
+                  ),
+                ),
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ItemList extends StatelessWidget {
+  const ItemList({
+    Key? key,
+    required this.items,
+    required this.selectCard,
+    required this.setDisplayed,
+    required this.showGridView,
+  }) : super(key: key);
+
+  final List<Item> items;
+  final Function selectCard;
+  final Function setDisplayed;
+  final bool showGridView;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color.fromARGB(0, 0, 0, 0),
+      floatingActionButton: showGridView
+          ? null
+          : TextButton(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(255, 254, 215, 227),
+                  borderRadius: const BorderRadius.all(Radius.circular(15)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 1,
+                      blurRadius: 2,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                width: 50,
+                height: 50,
+                child: const Icon(Icons.edit_outlined),
+              ),
+              onPressed: () => {}),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              decoration: InputDecoration(
+                prefixIcon: const Padding(
+                  padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                  child: Icon(Icons.search),
+                ),
+                suffixIcon: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                  child: CircleAvatar(backgroundImage: NetworkImage(allItems[0].image),),
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                  borderSide: BorderSide.none,
+                ),
+                filled: true,
+                contentPadding: const EdgeInsets.all(25),
+                hintStyle: const TextStyle(color: Color.fromARGB(255, 135, 129, 138)),
+                hintText: "Search replies",
+                fillColor: Colors.white,
+              ),
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: items.length,
+              itemBuilder: (context, index) => ItemListTile(
+                item: items[index],
+                selectCard: selectCard,
+                showGridView: showGridView,
+                setDisplayed: setDisplayed,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ItemListTile extends StatelessWidget {
+  const ItemListTile({
+    Key? key,
+    required this.item,
+    required this.selectCard,
+    required this.showGridView,
+    required this.setDisplayed,
+  }) : super(key: key);
+
+  final Item item;
+  final Function selectCard;
+  final Function setDisplayed;
+  final bool showGridView;
+
+  @override
+  Widget build(BuildContext context) {
+    final int index = allItems.indexOf(item);
+    final bool isSelected = ContextInformation.of(context).selected == index;
+
+    return GestureDetector(
+      onTap: (() {
+        selectCard(index);
+        if (!showGridView) {
+          setDisplayed(true);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => RouteDetailView(
+                item: item,
+                selectCard: selectCard,
+                setDisplayed: setDisplayed,
+              ),
+            ),
+          );
+        }
+      }),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Container(
+          decoration: BoxDecoration(
+              color: isSelected ? const Color.fromARGB(255, 237, 221, 255) : const Color.fromARGB(255, 245, 241, 248),
+              borderRadius: const BorderRadius.all(Radius.circular(10))),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    CircleAvatar(
+                      backgroundImage: NetworkImage(item.image),
+                    ),
+                    const SizedBox(width: 8),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(item.name, style: Theme.of(context).textTheme.bodyText1),
+                        const SizedBox(height: 3),
+                        Text('${item.time} ago', style: Theme.of(context).textTheme.caption),
+                      ],
+                    ),
+                    const Spacer(),
+                    Container(
+                      padding: const EdgeInsets.all(8.0),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.all(Radius.circular(50))),
+                      child: const Icon(Icons.star_outline),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Text(item.title, style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: 4),
+                Text(item.body.replaceRange(80, item.body.length, '...'), style: Theme.of(context).textTheme.bodyText1),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class DetailTile extends StatelessWidget {
+  const DetailTile({
+    required this.item,
+    Key? key,
+  }) : super(key: key);
+  final Item item;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: SizedBox(
+        height: 300,
+        child: Container(
+          decoration: const BoxDecoration(
+              color: Color.fromARGB(255, 245, 241, 248), borderRadius: BorderRadius.all(Radius.circular(10))),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(item.title, style: Theme.of(context).textTheme.titleLarge),
+                Text('3 Messages', style: Theme.of(context).textTheme.labelSmall),
+                const SizedBox(
+                  height: 20,
+                ),
+                Text(item.body, style: Theme.of(context).textTheme.bodyLarge),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class RouteDetailView extends StatelessWidget {
+  const RouteDetailView({required this.item, required this.selectCard, required this.setDisplayed, super.key});
+  final Item item;
+  final Function selectCard;
+  final Function setDisplayed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Column(
+        children: [
+          Align(
+            alignment: Alignment.topLeft,
+            child: TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                selectCard(null);
+                setDisplayed(false);
+              },
+              child: const Icon(Icons.arrow_back),
+            ),
+          ),
+          DetailTile(item: item),
+        ],
+      ),
+    );
+  }
+}
+
+class Item {
+  const Item({
+    required this.name,
+    required this.time,
+    required this.title,
+    required this.body,
+    required this.image,
+  });
+
+  final String name;
+  final String time;
+  final String title;
+  final String body;
+  final String image;
+}
+
+const List<Item> allItems = [
+  Item(
+      name: 'So Duri',
+      time: '20 min',
+      title: 'Dinner Club',
+      body:
+          "I think it's time for us to finally try that new noodle shop downtown that doesn't use menus. Anyone else have other suggestions for dinner club this week? I'm so intruiged by this idea of a noodle restaurant where no one gets to order for themselves - could be fun, or terrible, or both :)",
+      image: 'https://images.unsplash.com/photo-1463453091185-61582044d556?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTJ8fHByb2ZpbGUlMjBwaWN0dXJlfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60'),
+  Item(
+      name: 'Lily MacDonald',
+      time: '2 hours',
+      title: 'This food show is made for you',
+      body:
+          "3I think it's time for us to finally try that new noodle shop downtown that doesn't use menus. Anyone else have other suggestions for dinner club this week? I'm so intruiged by this idea of a noodle restaurant where no one gets to order for themselves - could be fun, or terrible, or both :)",
+      image: 'https://images.unsplash.com/photo-1603415526960-f7e0328c63b1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8cHJvZmlsZSUyMHBpY3R1cmV8ZW58MHx8MHx8&auto=format&fit=crop&w=800&q=60'),
+  Item(
+      name: 'Lani Mansell',
+      time: '10 min',
+      title: 'Dinner Club 4',
+      body:
+          "4I think it's time for us to finally try that new noodle shop downtown that doesn't use menus. Anyone else have other suggestions for dinner club this week? I'm so intruiged by this idea of a noodle restaurant where no one gets to order for themselves - could be fun, or terrible, or both :)",
+      image: 'https://images.unsplash.com/photo-1629467057571-42d22d8f0cbd?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTN8fHByb2ZpbGUlMjBwaWN0dXJlfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60'),
+  Item(
+      name: 'Caitlyn Marshall',
+      time: '10 min',
+      title: 'This food ',
+      body:
+          "1I think it's time for us to finally try that new noodle shop downtown that doesn't use menus. Anyone else have other suggestions for dinner club this week? I'm so intruiged by this idea of a noodle restaurant where no one gets to order for themselves - could be fun, or terrible, or both :)",
+      image: 'https://images.unsplash.com/photo-1619895862022-09114b41f16f?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Nnx8cHJvZmlsZSUyMHBpY3R1cmV8ZW58MHx8MHx8&auto=format&fit=crop&w=800&q=60'),
+  Item(
+      name: 'Robin Goff',
+      time: '10 min',
+      title: 'Dinner Club 5',
+      body:
+          "5I think it's time for us to finally try that new noodle shop downtown that doesn't use menus. Anyone else have other suggestions for dinner club this week? I'm so intruiged by this idea of a noodle restaurant where no one gets to order for themselves - could be fun, or terrible, or both :)",
+      image: 'https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTh8fHByb2ZpbGUlMjBwaWN0dXJlfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60'),
+  Item(
+      name: 'Klara Blankenship',
+      time: '10 min',
+      title: 'Dinner Club 6',
+      body:
+          "6I think it's time for us to finally try that new noodle shop downtown that doesn't use menus. Anyone else have other suggestions for dinner club this week? I'm so intruiged by this idea of a noodle restaurant where no one gets to order for themselves - could be fun, or terrible, or both :)",
+      image: 'https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTh8fHByb2ZpbGUlMjBwaWN0dXJlfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60'),
+  Item(
+      name: 'Bianka Bass',
+      time: '10 min',
+      title: 'Dinner Club 7',
+      body:
+          "7I think it's time for us to finally try that new noodle shop downtown that doesn't use menus. Anyone else have other suggestions for dinner club this week? I'm so intruiged by this idea of a noodle restaurant where no one gets to order for themselves - could be fun, or terrible, or both :)",
+      image: 'https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTh8fHByb2ZpbGUlMjBwaWN0dXJlfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60'),
+  Item(
+      name: 'Beau Kline',
+      time: '10 min',
+      title: 'Dinner Club 8',
+      body:
+          "8I think it's time for us to finally try that new noodle shop downtown that doesn't use menus. Anyone else have other suggestions for dinner club this week? I'm so intruiged by this idea of a noodle restaurant where no one gets to order for themselves - could be fun, or terrible, or both :)",
+      image: 'https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTh8fHByb2ZpbGUlMjBwaWN0dXJlfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60'),
+  Item(
+      name: 'Francisco Martin',
+      time: '10 min',
+      title: 'Dinner Club 9',
+      body:
+          "9I think it's time for us to finally try that new noodle shop downtown that doesn't use menus. Anyone else have other suggestions for dinner club this week? I'm so intruiged by this idea of a noodle restaurant where no one gets to order for themselves - could be fun, or terrible, or both :)",
+      image: 'https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTh8fHByb2ZpbGUlMjBwaWN0dXJlfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60'),
+];
