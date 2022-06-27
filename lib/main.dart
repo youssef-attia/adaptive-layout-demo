@@ -52,7 +52,10 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
+class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin, ChangeNotifier {
+
+  ValueNotifier showGridView = ValueNotifier(false);
+
   int? selected;
   void selectCard(int? index) {
     setState(() {
@@ -67,7 +70,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     });
   }
 
-  late AnimationController _controller;
   AnimatedWidget bottomToTop(controller, child) {
     return SlideTransition(
       position: Tween<Offset>(
@@ -102,13 +104,43 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     return ScaleTransition(scale: CurvedAnimation(parent: controller, curve: Curves.easeInOutCubic), child: child);
   }
 
+  int _selectedIndex = 0;
+
+  late AnimationController _controller;
+  late AnimationController _controller1;
+  late AnimationController _controller2;
+  late AnimationController _controller3;
+  late AnimationController _controller4;
   @override
   void initState() {
-    super.initState();
+    showGridView.addListener(() {
+      _controller1..reset()..forward();
+      _controller2..reset()..forward();
+      _controller3..reset()..forward();
+      _controller4..reset()..forward();
+    });
     _controller = AnimationController(
-      duration: const Duration(seconds: 1),
+      duration: const Duration(milliseconds: 1000),
       vsync: this,
     )..forward();
+    _controller1 = AnimationController(
+      duration: const Duration(milliseconds: 1200),
+      vsync: this,
+    )..forward();
+    _controller2 = AnimationController(
+      duration: const Duration(milliseconds: 1400),
+      vsync: this,
+    )..forward();
+    _controller3 = AnimationController(
+      duration: const Duration(milliseconds: 1600),
+      vsync: this,
+    )..forward();
+    _controller4 = AnimationController(
+      duration: const Duration(milliseconds: 1800),
+      vsync: this,
+    )..forward();
+
+    super.initState();
   }
 
   @override
@@ -119,6 +151,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    if(MediaQuery.of(context).size.width>800) {showGridView.value = true;} else {showGridView.value=false;}
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 236, 235, 243),
       body: SafeArea(
@@ -130,36 +163,59 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
               config: {
                 800: SlotLayoutConfig(
                   key: const Key('leftNavigation'),
-                  animation: leftOutIn,
                   child: SizedBox(
                     width: 75,
                     height: MediaQuery.of(context).size.height,
                     child: NavigationRail(
-                      leading: Container(
-                        decoration: BoxDecoration(
-                          color: const Color.fromARGB(255, 254, 215, 227),
-                          borderRadius: const BorderRadius.all(Radius.circular(15)),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.5),
-                              spreadRadius: 1,
-                              blurRadius: 2,
-                              offset: const Offset(0, 2), // changes position of shadow
-                            ),
-                          ],
+                      onDestinationSelected: (int index) {
+                        setState(() {
+                          _selectedIndex = index;
+                        });
+                      },
+                      selectedIndex: _selectedIndex,
+                      leading: ScaleTransition(
+                        scale: _controller1,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: const Color.fromARGB(255, 254, 215, 227),
+                            borderRadius: const BorderRadius.all(Radius.circular(15)),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                spreadRadius: 1,
+                                blurRadius: 2,
+                                offset: const Offset(0, 2), // changes position of shadow
+                              ),
+                            ],
+                          ),
+                          width: 50,
+                          height: 50,
+                          child: const Icon(Icons.edit_outlined),
                         ),
-                        width: 50,
-                        height: 50,
-                        child: const Icon(Icons.edit_outlined),
                       ),
                       backgroundColor: const Color.fromARGB(0, 255, 255, 255),
                       labelType: NavigationRailLabelType.none,
-                      selectedIndex: 0,
-                      destinations: const [
-                        NavigationRailDestination(icon: Icon(Icons.inbox), label: Text('Inbox')),
-                        NavigationRailDestination(icon: Icon(Icons.article_outlined), label: Text('Articles')),
-                        NavigationRailDestination(icon: Icon(Icons.chat_bubble_outline), label: Text('Chat')),
-                        NavigationRailDestination(icon: Icon(Icons.video_call_outlined), label: Text('Video')),
+                      destinations: [
+                        NavigationRailDestination(
+                            icon: SlideTransition(
+                                position: Tween(begin: const Offset(-1, 0), end: Offset.zero).animate(CurvedAnimation(parent:_controller1, curve: Curves.easeInOutCubic)),
+                                child: const Icon(Icons.inbox)),
+                            label: const Text('Inbox')),
+                        NavigationRailDestination(
+                            icon: SlideTransition(
+                                position: Tween(begin: const Offset(-2, 0), end: Offset.zero).animate(CurvedAnimation(parent:_controller2, curve: Curves.easeInOutCubic)),
+                                child: const Icon(Icons.article_outlined)),
+                            label: const Text('Articles')),
+                        NavigationRailDestination(
+                            icon: SlideTransition(
+                                position: Tween(begin: const Offset(-3, 0), end: Offset.zero).animate(CurvedAnimation(parent:_controller3, curve: Curves.easeInOutCubic)),
+                                child: const Icon(Icons.chat_bubble_outline)),
+                            label: const Text('Chat')),
+                        NavigationRailDestination(
+                            icon: SlideTransition(
+                                position: Tween(begin: const Offset(-4, 0), end: Offset.zero).animate(CurvedAnimation(parent:_controller4, curve: Curves.easeInOutCubic)),
+                                child: const Icon(Icons.video_call_outlined)),
+                            label: const Text('Video')),
                       ],
                     ),
                   ),
@@ -207,11 +263,11 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                         labelType: NavigationRailLabelType.none,
                         selectedIndex: 0,
                         extended: true,
-                        destinations: const [
-                          NavigationRailDestination(icon: Icon(Icons.inbox), label: Text('Inbox')),
-                          NavigationRailDestination(icon: Icon(Icons.article_outlined), label: Text('Articles')),
-                          NavigationRailDestination(icon: Icon(Icons.chat_bubble_outline), label: Text('Chat')),
-                          NavigationRailDestination(icon: Icon(Icons.video_call_outlined), label: Text('Video')),
+                        destinations: [
+                          NavigationRailDestination(icon: ScaleTransition(scale:_controller1, child: const Icon(Icons.inbox)), label: const Text('Inbox')),
+                          NavigationRailDestination(icon: ScaleTransition(scale:_controller1, child: const Icon(Icons.article_outlined)), label: const Text('Articles')),
+                          NavigationRailDestination(icon: ScaleTransition(scale:_controller1, child: const Icon(Icons.chat_bubble_outline)), label: const Text('Chat')),
+                          NavigationRailDestination(icon: ScaleTransition(scale:_controller1, child: const Icon(Icons.video_call_outlined)), label: const Text('Video')),
                         ],
                       ),
                     ),
@@ -223,12 +279,13 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
               config: {
                 0: SlotLayoutConfig(
                   key: const Key('body'),
-                  child: Padding(
+                  child:
+                  (_selectedIndex==0)?Padding(
                     padding: const EdgeInsets.fromLTRB(32, 32, 32, 0),
                     child: ItemList(items: allItems, selectCard: selectCard, setDisplayed: setDisplayed, showGridView: false),
-                  ),
+                  ):const ExamplePage(),
                 ),
-                800: SlotLayoutConfig(
+                if(_selectedIndex==0) 800: SlotLayoutConfig(
                   key: const Key('body1'),
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(0, 32, 0, 0),
@@ -237,16 +294,16 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                 ),
               },
             ),
-            bodyLeft: SlotLayout(
+            rightBody: _selectedIndex==0? SlotLayout(
               config: {
                 800: SlotLayoutConfig(
-                  key: const Key('bodyLeft'),
+                  key: const Key('rightBody'),
                   child: DetailTile(
                     item: allItems[selected ?? 0],
                   ),
                 ),
               },
-            ),
+            ):null,
             bottomNavigation: SlotLayout(
               config: {
                 0: SlotLayoutConfig(
@@ -507,6 +564,15 @@ class RouteDetailView extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class ExamplePage extends StatelessWidget {
+  const ExamplePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(color: Colors.grey);
   }
 }
 

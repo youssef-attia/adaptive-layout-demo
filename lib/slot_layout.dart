@@ -1,5 +1,14 @@
+// Copyright 2014 The Flutter Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+import 'package:flutter/widgets.dart';
 import 'slot_layout_config.dart';
-import 'package:flutter/material.dart';
+
+/// A Widget that takes a mapping of [SlotLayoutConfig]s to breakpoints and returns a chosen
+/// Widget based on the current screen size.
+///
+/// Commonly used with [AdaptiveLayout] but also functional on its own.
 
 // ignore: must_be_immutable
 class SlotLayout extends StatefulWidget {
@@ -9,6 +18,10 @@ class SlotLayout extends StatefulWidget {
     });
 
   bool isActive = false;
+
+  /// The mapping that is used to determine what Widget to display at what point.
+  ///
+  /// The int represents screen width.
   final Map<int, SlotLayoutConfig> config;
   @override
   State<SlotLayout> createState() => _SlotLayoutState();
@@ -17,7 +30,7 @@ class SlotLayout extends StatefulWidget {
 class _SlotLayoutState extends State<SlotLayout> with SingleTickerProviderStateMixin{
   late AnimationController _controller;
   late SlotLayoutConfig chosenWidget;
-  ValueNotifier<Key> changedWidget = ValueNotifier(const Key(''));
+  ValueNotifier<Key> changedWidget = ValueNotifier<Key>(const Key(''));
 
   @override
   void initState() {
@@ -43,7 +56,7 @@ class _SlotLayoutState extends State<SlotLayout> with SingleTickerProviderStateM
   Widget build(BuildContext context) {
     chosenWidget = SlotLayoutConfig(key: const Key(''), child: const SizedBox(width: 0, height: 0));
     widget.isActive = false;
-    widget.config.forEach((key, value) {
+    widget.config.forEach((int key, SlotLayoutConfig value) {
       pickWidget(context, key, value);
     });
     chosenWidget.controller = _controller;
