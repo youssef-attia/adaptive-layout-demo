@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
           NavigationDestination(icon: Icon(Icons.chat), label: 'hello2'),
           NavigationDestination(icon: Icon(Icons.video_call), label: 'hello3'),
         ],
-        body: [
+        bodyList: [
           ListView.builder(
             itemCount: allItems.length,
             itemBuilder: (context, index) => Padding(
@@ -48,17 +48,8 @@ class MyApp extends StatelessWidget {
           )
           ,null
         ],
-        secondaryBody: [
-          ListView.builder(
-            itemCount: allItems.length,
-            itemBuilder: (context, index) => Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                height: 250,
-                color: Colors.red,
-              ),
-            ),
-          ),
+        secondaryBodyList: [
+          null,
           ListView.builder(
             itemCount: allItems.length,
             itemBuilder: (context, index) => Padding(
@@ -68,8 +59,8 @@ class MyApp extends StatelessWidget {
                 color: Colors.red,
               ),
             ),
-          )
-          ,null
+          ),
+          null,
         ],
       )
     );
