@@ -84,11 +84,11 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin, 
       body: SafeArea(
         child:
 AdaptiveLayout(
-  leftNavigation: SlotLayout(
+  primaryNavigation: SlotLayout(
     config: {
       800: SlotLayoutConfig(
-        animation: leftOutIn,
-        key: const Key('leftNavigation'),
+        inAnimation: leftOutIn,
+        key: const Key('primaryNavigation'),
         child: SizedBox(
           width: 75,
           height: MediaQuery.of(context).size.height,
@@ -105,8 +105,8 @@ AdaptiveLayout(
         ),
       ),
       1000: SlotLayoutConfig(
-        key: const Key('leftNavigation1'),
-        animation: leftOutIn,
+        key: const Key('primaryNavigation1'),
+        inAnimation: leftOutIn,
         child: SizedBox(
           width: 150,
           height: MediaQuery.of(context).size.height,
@@ -134,7 +134,7 @@ AdaptiveLayout(
           itemBuilder: (context, index) => Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(
-              color: Color.fromARGB(255, 255, 201, 197),
+              color: const Color.fromARGB(255, 255, 201, 197),
               height: 400,
             ),
           ),
@@ -147,7 +147,7 @@ AdaptiveLayout(
           children: allItems.map((item) => Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(
-              color: Color.fromARGB(255, 255, 201, 197),
+              color: const Color.fromARGB(255, 255, 201, 197),
               height: 400,
             ),
           )).toList(),
@@ -159,7 +159,7 @@ AdaptiveLayout(
     config: {
       0: SlotLayoutConfig(
         key: const Key('botnav'),
-        animation: bottomToTop,
+        inAnimation: bottomToTop,
         child: BottomNavigationBar(
           selectedItemColor: Colors.black,
           backgroundColor: const Color.fromARGB(0, 0, 0, 0),
@@ -171,9 +171,9 @@ AdaptiveLayout(
           ],
         ),
       ),
-      800: SlotLayoutConfig(
-        key: const Key('botnav1'),
-        child: const SizedBox(
+      800: const SlotLayoutConfig(
+        key: Key('botnav1'),
+        child: SizedBox(
           height: 0,
           width: 0,
         ),

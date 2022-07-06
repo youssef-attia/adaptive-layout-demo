@@ -70,35 +70,54 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin, 
     });
   }
 
-  AnimatedWidget bottomToTop(controller, child) {
-    return SlideTransition(
-      position: Tween<Offset>(
-        begin: const Offset(0, 1),
-        end: Offset.zero,
-      ).animate(CurvedAnimation(parent: controller, curve: Curves.easeInOutCubic)),
-      child: child,
-    );
-  }
+AnimatedWidget bottomToTop(child, animation) {
+  return SlideTransition(
+    position: Tween<Offset>(
+      begin: const Offset(0, 1),
+      end: Offset.zero,
+    ).animate(animation),
+    child: child,
+  );
+}
 
-  AnimatedWidget leftOutIn(controller, child) {
-    return SlideTransition(
-      position: Tween<Offset>(
-        begin: const Offset(-1, 0),
-        end: Offset.zero,
-      ).animate(controller),
-      child: child,
-    );
-  }
+AnimatedWidget topToBottom(child, animation) {
+  return SlideTransition(
+    position: Tween<Offset>(
+      begin: Offset.zero,
+      end: const Offset(0, 1),
+    ).animate(animation),
+    child: child,
+  );
+}
 
-  AnimatedWidget rightOutIn(AnimationController controller, Widget child) {
-    return SlideTransition(
-      position: Tween<Offset>(
-        begin: const Offset(1, 0),
-        end: Offset.zero,
-      ).animate(CurvedAnimation(parent: controller, curve: Curves.easeInOutCubic)),
-      child: child,
-    );
-  }
+AnimatedWidget leftOutIn(child, animation) {
+  return SlideTransition(
+    position: Tween<Offset>(
+      begin: const Offset(-1, 0),
+      end: Offset.zero,
+    ).animate(animation),
+    child: child,
+  );
+}
+AnimatedWidget leftInOut(child, animation) {
+  return SlideTransition(
+    position: Tween<Offset>(
+      begin: Offset.zero,
+      end: const Offset(-1, 0),
+    ).animate(animation),
+    child: child,
+  );
+}
+
+AnimatedWidget rightOutIn(Widget child, animation) {
+  return SlideTransition(
+    position: Tween<Offset>(
+      begin: const Offset(1, 0),
+      end: Offset.zero,
+    ).animate(animation),
+    child: child,
+  );
+}
 
   Widget sizeIn(AnimationController controller, Widget child) {
     return ScaleTransition(scale: CurvedAnimation(parent: controller, curve: Curves.easeInOutCubic), child: child);
@@ -159,10 +178,17 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin, 
           selected: selected,
           displayed: displayed,
           child: AdaptiveLayout(
-            leftNavigation: SlotLayout(
+            primaryNavigation: SlotLayout(
               config: {
+                0: const SlotLayoutConfig(
+                  key: Key('leftNav0'),
+                  child: SizedBox(
+                    height: 0,
+                    width: 0,
+                  ),
+                ),
                 800: SlotLayoutConfig(
-                  key: const Key('leftNavigation'),
+                  key: const Key('primaryNavigation'),
                   child: SizedBox(
                     width: 75,
                     height: MediaQuery.of(context).size.height,
@@ -221,8 +247,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin, 
                   ),
                 ),
                 1000: SlotLayoutConfig(
-                  key: const Key('leftNavigation1'),
-                  animation: leftOutIn,
+                  key: const Key('primaryNavigation1'),
+                  inAnimation: leftOutIn,
+                  overtakeAnimation: leftInOut,
                   child: SizedBox(
                     width: 200,
                     height: MediaQuery.of(context).size.height,
@@ -294,10 +321,10 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin, 
                 ),
               },
             ),
-            rightBody: _selectedIndex==0? SlotLayout(
+            secondaryBody: _selectedIndex==0? SlotLayout(
               config: {
                 800: SlotLayoutConfig(
-                  key: const Key('rightBody'),
+                  key: const Key('secondaryBody'),
                   child: DetailTile(
                     item: allItems[selected ?? 0],
                   ),
@@ -308,7 +335,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin, 
               config: {
                 0: SlotLayoutConfig(
                   key: const Key('botnav'),
-                  animation: bottomToTop,
+                  inAnimation: bottomToTop,
                   child: BottomNavigationBar(
                     selectedItemColor: Colors.black,
                     backgroundColor: const Color.fromARGB(0, 0, 0, 0),
@@ -321,6 +348,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin, 
                   ),
                 ),
                 800: SlotLayoutConfig(
+                  overtakeAnimation: topToBottom,
                   key: const Key('botnav1'),
                   child: const SizedBox(
                     height: 0,
@@ -445,10 +473,12 @@ class ItemListTile extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => RouteDetailView(
-                item: item,
-                selectCard: selectCard,
-                setDisplayed: setDisplayed,
+              builder: (context) => SafeArea(
+                child: RouteDetailView(
+                  item: item,
+                  selectCard: selectCard,
+                  setDisplayed: setDisplayed,
+                ),
               ),
             ),
           );
@@ -599,61 +629,61 @@ const List<Item> allItems = [
       title: 'Dinner Club',
       body:
           "I think it's time for us to finally try that new noodle shop downtown that doesn't use menus. Anyone else have other suggestions for dinner club this week? I'm so intruiged by this idea of a noodle restaurant where no one gets to order for themselves - could be fun, or terrible, or both :)",
-      image: 'https://images.unsplash.com/photo-1463453091185-61582044d556?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTJ8fHByb2ZpbGUlMjBwaWN0dXJlfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60'),
+      image: 'https://images.unsplash.com/photo-1463453091185-61582044d556?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTJ8fHByb2ZpbGUlMjBwaWN0dXJlfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=400&q=60'),
   Item(
-      name: 'Lily MacDonald',
+      name: 'Lily Mac',
       time: '2 hours',
       title: 'This food show is made for you',
       body:
           "3I think it's time for us to finally try that new noodle shop downtown that doesn't use menus. Anyone else have other suggestions for dinner club this week? I'm so intruiged by this idea of a noodle restaurant where no one gets to order for themselves - could be fun, or terrible, or both :)",
-      image: 'https://images.unsplash.com/photo-1603415526960-f7e0328c63b1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8cHJvZmlsZSUyMHBpY3R1cmV8ZW58MHx8MHx8&auto=format&fit=crop&w=800&q=60'),
+      image: 'https://images.unsplash.com/photo-1603415526960-f7e0328c63b1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8cHJvZmlsZSUyMHBpY3R1cmV8ZW58MHx8MHx8&auto=format&fit=crop&w=400&q=60'),
   Item(
       name: 'Lani Mansell',
       time: '10 min',
       title: 'Dinner Club 4',
       body:
           "4I think it's time for us to finally try that new noodle shop downtown that doesn't use menus. Anyone else have other suggestions for dinner club this week? I'm so intruiged by this idea of a noodle restaurant where no one gets to order for themselves - could be fun, or terrible, or both :)",
-      image: 'https://images.unsplash.com/photo-1629467057571-42d22d8f0cbd?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTN8fHByb2ZpbGUlMjBwaWN0dXJlfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60'),
+      image: 'https://images.unsplash.com/photo-1629467057571-42d22d8f0cbd?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTN8fHByb2ZpbGUlMjBwaWN0dXJlfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=400&q=60'),
   Item(
-      name: 'Caitlyn Marshall',
+      name: 'Caitlyn Mars',
       time: '10 min',
       title: 'This food ',
       body:
           "1I think it's time for us to finally try that new noodle shop downtown that doesn't use menus. Anyone else have other suggestions for dinner club this week? I'm so intruiged by this idea of a noodle restaurant where no one gets to order for themselves - could be fun, or terrible, or both :)",
-      image: 'https://images.unsplash.com/photo-1619895862022-09114b41f16f?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Nnx8cHJvZmlsZSUyMHBpY3R1cmV8ZW58MHx8MHx8&auto=format&fit=crop&w=800&q=60'),
+      image: 'https://images.unsplash.com/photo-1619895862022-09114b41f16f?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Nnx8cHJvZmlsZSUyMHBpY3R1cmV8ZW58MHx8MHx8&auto=format&fit=crop&w=400&q=60'),
   Item(
       name: 'Robin Goff',
       time: '10 min',
       title: 'Dinner Club 5',
       body:
           "5I think it's time for us to finally try that new noodle shop downtown that doesn't use menus. Anyone else have other suggestions for dinner club this week? I'm so intruiged by this idea of a noodle restaurant where no one gets to order for themselves - could be fun, or terrible, or both :)",
-      image: 'https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTh8fHByb2ZpbGUlMjBwaWN0dXJlfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60'),
+      image: 'https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTh8fHByb2ZpbGUlMjBwaWN0dXJlfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=400&q=60'),
   Item(
-      name: 'Klara Blankenship',
+      name: 'Klara Blan',
       time: '10 min',
       title: 'Dinner Club 6',
       body:
           "6I think it's time for us to finally try that new noodle shop downtown that doesn't use menus. Anyone else have other suggestions for dinner club this week? I'm so intruiged by this idea of a noodle restaurant where no one gets to order for themselves - could be fun, or terrible, or both :)",
-      image: 'https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTh8fHByb2ZpbGUlMjBwaWN0dXJlfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60'),
+      image: 'https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTh8fHByb2ZpbGUlMjBwaWN0dXJlfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=400&q=60'),
   Item(
       name: 'Bianka Bass',
       time: '10 min',
       title: 'Dinner Club 7',
       body:
           "7I think it's time for us to finally try that new noodle shop downtown that doesn't use menus. Anyone else have other suggestions for dinner club this week? I'm so intruiged by this idea of a noodle restaurant where no one gets to order for themselves - could be fun, or terrible, or both :)",
-      image: 'https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTh8fHByb2ZpbGUlMjBwaWN0dXJlfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60'),
+      image: 'https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTh8fHByb2ZpbGUlMjBwaWN0dXJlfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=400&q=60'),
   Item(
       name: 'Beau Kline',
       time: '10 min',
       title: 'Dinner Club 8',
       body:
           "8I think it's time for us to finally try that new noodle shop downtown that doesn't use menus. Anyone else have other suggestions for dinner club this week? I'm so intruiged by this idea of a noodle restaurant where no one gets to order for themselves - could be fun, or terrible, or both :)",
-      image: 'https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTh8fHByb2ZpbGUlMjBwaWN0dXJlfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60'),
+      image: 'https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTh8fHByb2ZpbGUlMjBwaWN0dXJlfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=400&q=60'),
   Item(
-      name: 'Francisco Martin',
+      name: 'Fran Martin',
       time: '10 min',
       title: 'Dinner Club 9',
       body:
           "9I think it's time for us to finally try that new noodle shop downtown that doesn't use menus. Anyone else have other suggestions for dinner club this week? I'm so intruiged by this idea of a noodle restaurant where no one gets to order for themselves - could be fun, or terrible, or both :)",
-      image: 'https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTh8fHByb2ZpbGUlMjBwaWN0dXJlfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60'),
+      image: 'https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTh8fHByb2ZpbGUlMjBwaWN0dXJlfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=400&q=60'),
 ];
