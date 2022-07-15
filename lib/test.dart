@@ -70,7 +70,7 @@ class MyApp extends StatelessWidget {
               home: AdaptiveLayout(
                 primaryNavigation: SlotLayout(
                   config: <int, SlotLayoutConfig?>{
-                    900: SlotLayoutConfig(inAnimation: leftOutIn, outAnimation: leftInOut, key: const Key('800'), builder: on1),
+                    900: SlotLayoutConfig(key: const Key('800'), builder: on1),
                   },
                 ),
                 secondaryNavigation: SlotLayout(
@@ -90,8 +90,7 @@ class MyApp extends StatelessWidget {
                 ),
                 body: SlotLayout(
                   config: <int, SlotLayoutConfig>{
-                    0: SlotLayoutConfig(key: const Key('b'), builder: (_) => Container(color: Colors.red,)),
-                    800: SlotLayoutConfig(key: const Key('b1'), builder: (_) => Container(color: Colors.red,)),
+                    0: SlotLayoutConfig(key: const Key('b1'), builder: (_) => Container(color: Colors.red,)),
                   },
                 ),
                 secondaryBody: SlotLayout(
