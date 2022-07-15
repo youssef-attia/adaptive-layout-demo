@@ -1,6 +1,3 @@
-import 'package:adaptive_layout_api/adaptive_layout.dart';
-import 'package:adaptive_layout_api/slot_layout.dart';
-import 'package:adaptive_layout_api/slot_layout_config.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -118,6 +115,12 @@ AnimatedWidget rightOutIn(Widget child, animation) {
     child: child,
   );
 }
+  Widget stayOnScreen(Widget child, AnimationController animation) {
+    return FadeTransition(
+      opacity: Tween<double>(begin: 1.0, end: 1.0).animate(animation),
+      child: child,
+    );
+  }
 
   Widget sizeIn(AnimationController controller, Widget child) {
     return ScaleTransition(scale: CurvedAnimation(parent: controller, curve: Curves.easeInOutCubic), child: child);
@@ -170,6 +173,12 @@ AnimatedWidget rightOutIn(Widget child, animation) {
 
   @override
   Widget build(BuildContext context) {
+    const List<NavigationDestination> destinations = [
+      NavigationDestination(label: 'Inbox', icon: Icon(Icons.inbox, color: Colors.black)),
+      NavigationDestination(label: 'Articles', icon: Icon(Icons.article_outlined, color: Colors.black)),
+      NavigationDestination(label: 'Chat', icon: Icon(Icons.chat_bubble_outline, color: Colors.black)),
+      NavigationDestination(label: 'Video', icon: Icon(Icons.video_call_outlined, color: Colors.black)),
+    ];
     if(MediaQuery.of(context).size.width>800) {showGridView.value = true;} else {showGridView.value=false;}
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 236, 235, 243),
@@ -177,185 +186,141 @@ AnimatedWidget rightOutIn(Widget child, animation) {
         child: ContextInformation(
           selected: selected,
           displayed: displayed,
-          child: AdaptiveLayout(
-            primaryNavigation: SlotLayout(
-              config: {
-                0: const SlotLayoutConfig(
-                  key: Key('leftNav0'),
-                  child: SizedBox(
-                    height: 0,
-                    width: 0,
-                  ),
-                ),
-                800: SlotLayoutConfig(
-                  key: const Key('primaryNavigation'),
-                  child: SizedBox(
-                    width: 75,
-                    height: MediaQuery.of(context).size.height,
-                    child: NavigationRail(
-                      onDestinationSelected: (int index) {
-                        setState(() {
-                          _selectedIndex = index;
-                        });
-                      },
-                      selectedIndex: _selectedIndex,
-                      leading: ScaleTransition(
-                        scale: _controller1,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 254, 215, 227),
-                            borderRadius: const BorderRadius.all(Radius.circular(15)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                spreadRadius: 1,
-                                blurRadius: 2,
-                                offset: const Offset(0, 2), // changes position of shadow
-                              ),
-                            ],
-                          ),
-                          width: 50,
-                          height: 50,
-                          child: const Icon(Icons.edit_outlined),
-                        ),
-                      ),
-                      backgroundColor: const Color.fromARGB(0, 255, 255, 255),
-                      labelType: NavigationRailLabelType.none,
-                      destinations: [
-                        NavigationRailDestination(
-                            icon: SlideTransition(
-                                position: Tween(begin: const Offset(-1, 0), end: Offset.zero).animate(CurvedAnimation(parent:_controller1, curve: Curves.easeInOutCubic)),
-                                child: const Icon(Icons.inbox)),
-                            label: const Text('Inbox')),
-                        NavigationRailDestination(
-                            icon: SlideTransition(
-                                position: Tween(begin: const Offset(-2, 0), end: Offset.zero).animate(CurvedAnimation(parent:_controller2, curve: Curves.easeInOutCubic)),
-                                child: const Icon(Icons.article_outlined)),
-                            label: const Text('Articles')),
-                        NavigationRailDestination(
-                            icon: SlideTransition(
-                                position: Tween(begin: const Offset(-3, 0), end: Offset.zero).animate(CurvedAnimation(parent:_controller3, curve: Curves.easeInOutCubic)),
-                                child: const Icon(Icons.chat_bubble_outline)),
-                            label: const Text('Chat')),
-                        NavigationRailDestination(
-                            icon: SlideTransition(
-                                position: Tween(begin: const Offset(-4, 0), end: Offset.zero).animate(CurvedAnimation(parent:_controller4, curve: Curves.easeInOutCubic)),
-                                child: const Icon(Icons.video_call_outlined)),
-                            label: const Text('Video')),
-                      ],
-                    ),
-                  ),
-                ),
-                1000: SlotLayoutConfig(
-                  key: const Key('primaryNavigation1'),
-                  inAnimation: leftOutIn,
-                  overtakeAnimation: leftInOut,
-                  child: SizedBox(
-                    width: 200,
-                    height: MediaQuery.of(context).size.height,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
+          child: Directionality(
+            textDirection: TextDirection.ltr,
+            child: AdaptiveLayout(
+              primaryNavigation: SlotLayout(
+                config: {
+                  800: SlotLayoutConfig(
+                    key: const Key('primaryNavigation'),
+                    builder: (_) => SizedBox(
+                      width: 75,
+                      height: MediaQuery.of(context).size.height,
                       child: NavigationRail(
-                        leading: Padding(
-                          padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
+                        onDestinationSelected: (int index) {
+                          setState(() {
+                            _selectedIndex = index;
+                          });
+                        },
+                        selectedIndex: _selectedIndex,
+                        leading: ScaleTransition(
+                          scale: _controller1,
                           child: Container(
-                            alignment: Alignment.centerLeft,
-                              decoration: BoxDecoration(
-                                color: const Color.fromARGB(255, 255, 225, 231),
-                                borderRadius: const BorderRadius.all(Radius.circular(15)),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.5),
-                                    spreadRadius: 1,
-                                    blurRadius: 2,
-                                    offset: const Offset(0, 2), // changes position of shadow
-                                  ),
-                                ],
-                              ),
-                              width: 200,
-                              height: 50,
-                              child: Padding(
-                                padding: const EdgeInsets.fromLTRB(16.0,0,0,0),
-                                child: Row(
-                                  children: const [
-                                    Icon(Icons.edit_outlined),
-                                    SizedBox(width: 20),
-                                    Center(child:Text('Compose')),
-                                  ],
+                            decoration: BoxDecoration(
+                              color: const Color.fromARGB(255, 254, 215, 227),
+                              borderRadius: const BorderRadius.all(Radius.circular(15)),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  spreadRadius: 1,
+                                  blurRadius: 2,
+                                  offset: const Offset(0, 2), // changes position of shadow
                                 ),
-                              ),
+                              ],
+                            ),
+                            width: 50,
+                            height: 50,
+                            child: const Icon(Icons.edit_outlined),
                           ),
                         ),
                         backgroundColor: const Color.fromARGB(0, 255, 255, 255),
                         labelType: NavigationRailLabelType.none,
-                        selectedIndex: 0,
-                        extended: true,
                         destinations: [
-                          NavigationRailDestination(icon: ScaleTransition(scale:_controller1, child: const Icon(Icons.inbox)), label: const Text('Inbox')),
-                          NavigationRailDestination(icon: ScaleTransition(scale:_controller1, child: const Icon(Icons.article_outlined)), label: const Text('Articles')),
-                          NavigationRailDestination(icon: ScaleTransition(scale:_controller1, child: const Icon(Icons.chat_bubble_outline)), label: const Text('Chat')),
-                          NavigationRailDestination(icon: ScaleTransition(scale:_controller1, child: const Icon(Icons.video_call_outlined)), label: const Text('Video')),
+                          NavigationRailDestination(
+                              icon: SlideTransition(
+                                  position: Tween(begin: const Offset(-1, 0), end: Offset.zero).animate(CurvedAnimation(parent:_controller1, curve: Curves.easeInOutCubic)),
+                                  child: const Icon(Icons.inbox)),
+                              label: const Text('Inbox')),
+                          NavigationRailDestination(
+                              icon: SlideTransition(
+                                  position: Tween(begin: const Offset(-2, 0), end: Offset.zero).animate(CurvedAnimation(parent:_controller2, curve: Curves.easeInOutCubic)),
+                                  child: const Icon(Icons.article_outlined)),
+                              label: const Text('Articles')),
+                          NavigationRailDestination(
+                              icon: SlideTransition(
+                                  position: Tween(begin: const Offset(-3, 0), end: Offset.zero).animate(CurvedAnimation(parent:_controller3, curve: Curves.easeInOutCubic)),
+                                  child: const Icon(Icons.chat_bubble_outline)),
+                              label: const Text('Chat')),
+                          NavigationRailDestination(
+                              icon: SlideTransition(
+                                  position: Tween(begin: const Offset(-4, 0), end: Offset.zero).animate(CurvedAnimation(parent:_controller4, curve: Curves.easeInOutCubic)),
+                                  child: const Icon(Icons.video_call_outlined)),
+                              label: const Text('Video')),
                         ],
                       ),
                     ),
                   ),
-                ),
-              },
-            ),
-            body: SlotLayout(
-              config: {
-                0: SlotLayoutConfig(
-                  key: const Key('body'),
-                  child:
-                  (_selectedIndex==0)?Padding(
-                    padding: const EdgeInsets.fromLTRB(32, 32, 32, 0),
-                    child: ItemList(items: allItems, selectCard: selectCard, setDisplayed: setDisplayed, showGridView: false),
-                  ):const ExamplePage(),
-                ),
-                if(_selectedIndex==0) 800: SlotLayoutConfig(
-                  key: const Key('body1'),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 32, 0, 0),
-                    child: ItemList(items: allItems, selectCard: selectCard, setDisplayed: setDisplayed, showGridView: true),
+                  1000: SlotLayoutConfig(
+                    key: const Key('primaryNavigation1'),
+                    inAnimation: leftOutIn,
+                    builder:(_) => AdaptiveScaffold.toNavigationRail(
+                      leading: Padding(
+                        padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
+                        child: Container(
+                          alignment: Alignment.centerLeft,
+                            decoration: BoxDecoration(
+                              color: const Color.fromARGB(255, 255, 225, 231),
+                              borderRadius: const BorderRadius.all(Radius.circular(15)),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  spreadRadius: 1,
+                                  blurRadius: 2,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            width: 200,
+                            height: 50,
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(16.0,0,0,0),
+                              child: Row(
+                                children: const [
+                                  Icon(Icons.edit_outlined),
+                                  SizedBox(width: 20),
+                                  Center(child:Text('Compose')),
+                                ],
+                              ),
+                            ),
+                        ),
+                      ),
+                      backgroundColor: const Color.fromARGB(0, 255, 255, 255),
+                      labelType: NavigationRailLabelType.none,
+                      selectedIndex: 0,
+                      extended: true,
+                      destinations: destinations,
+                    ),
                   ),
-                ),
-              },
-            ),
-            secondaryBody: _selectedIndex==0? SlotLayout(
-              config: {
-                800: SlotLayoutConfig(
-                  key: const Key('secondaryBody'),
-                  child: DetailTile(
-                    item: allItems[selected ?? 0],
+                },
+              ),
+              body: SlotLayout(
+                config: {
+                  0: SlotLayoutConfig(
+                    key: const Key('body'),
+                    builder: (_) =>
+                    (_selectedIndex==0)?Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 32, 16, 0),
+                      child: ItemList(items: allItems, selectCard: selectCard, setDisplayed: setDisplayed, showGridView: false),
+                    ):const ExamplePage(),
                   ),
-                ),
-              },
-            ):null,
-            bottomNavigation: SlotLayout(
-              config: {
-                0: SlotLayoutConfig(
-                  key: const Key('botnav'),
-                  inAnimation: bottomToTop,
-                  child: BottomNavigationBar(
-                    selectedItemColor: Colors.black,
-                    backgroundColor: const Color.fromARGB(0, 0, 0, 0),
-                    items: const [
-                      BottomNavigationBarItem(label: 'Inbox', icon: Icon(Icons.inbox, color: Colors.black)),
-                      BottomNavigationBarItem(label: 'Articles', icon: Icon(Icons.article_outlined, color: Colors.black)),
-                      BottomNavigationBarItem(label: 'Chat', icon: Icon(Icons.chat_bubble_outline, color: Colors.black)),
-                      BottomNavigationBarItem(label: 'Video', icon: Icon(Icons.video_call_outlined, color: Colors.black)),
-                    ],
+                },
+              ),
+              secondaryBody: _selectedIndex==0? SlotLayout(
+                config: {
+                  800: SlotLayoutConfig(outAnimation: stayOnScreen, key: const Key('sb1'), builder: (_) => DetailTile(item: allItems[selected ?? 0])),
+                },
+              ):null,
+              bottomNavigation: SlotLayout(
+                config: {
+                  0: SlotLayoutConfig(
+                    key: const Key('bn'),
+                    inAnimation: bottomToTop,
+                    outAnimation: topToBottom,
+                    builder:(_) => AdaptiveScaffold.toBottomNavigationBar(destinations: destinations),
                   ),
-                ),
-                800: SlotLayoutConfig(
-                  overtakeAnimation: topToBottom,
-                  key: const Key('botnav1'),
-                  child: const SizedBox(
-                    height: 0,
-                    width: 0,
-                  ),
-                ),
-              },
+                  800: SlotLayoutConfig.empty(),
+                },
+              ),
             ),
           ),
         ),
@@ -402,7 +367,7 @@ class ItemList extends StatelessWidget {
                 height: 50,
                 child: const Icon(Icons.edit_outlined),
               ),
-              onPressed: () => {}),
+              onPressed: () =>{}),
       body: Column(
         children: [
           Padding(

@@ -1,6 +1,3 @@
-import 'package:adaptive_layout_api/adaptive_layout.dart';
-import 'package:adaptive_layout_api/slot_layout.dart';
-import 'package:adaptive_layout_api/slot_layout_config.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -32,32 +29,52 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin, ChangeNotifier {
-  AnimatedWidget bottomToTop(controller, child) {
+  AnimatedWidget bottomToTop(Widget child, AnimationController animation) {
     return SlideTransition(
       position: Tween<Offset>(
         begin: const Offset(0, 1),
         end: Offset.zero,
-      ).animate(CurvedAnimation(parent: controller, curve: Curves.easeInOutCubic)),
+      ).animate(animation),
       child: child,
     );
   }
 
-  AnimatedWidget rightOutIn(AnimationController controller, Widget child) {
+  AnimatedWidget topToBottom(Widget child, AnimationController animation) {
     return SlideTransition(
       position: Tween<Offset>(
-        begin: const Offset(1, 0),
-        end: Offset.zero,
-      ).animate(CurvedAnimation(parent: controller, curve: Curves.easeInOutCubic)),
+        begin: Offset.zero,
+        end: const Offset(0, 1),
+      ).animate(animation),
       child: child,
     );
   }
 
-  AnimatedWidget leftOutIn(controller, child) {
+  AnimatedWidget leftOutIn(Widget child, AnimationController animation) {
     return SlideTransition(
       position: Tween<Offset>(
         begin: const Offset(-1, 0),
         end: Offset.zero,
-      ).animate(controller),
+      ).animate(animation),
+      child: child,
+    );
+  }
+
+  AnimatedWidget leftInOut(Widget child, AnimationController animation) {
+    return SlideTransition(
+      position: Tween<Offset>(
+        begin: Offset.zero,
+        end: const Offset(-1, 0),
+      ).animate(animation),
+      child: child,
+    );
+  }
+
+  AnimatedWidget rightOutIn(Widget child, AnimationController animation) {
+    return SlideTransition(
+      position: Tween<Offset>(
+        begin: const Offset(1, 0),
+        end: Offset.zero,
+      ).animate(animation),
       child: child,
     );
   }
@@ -80,48 +97,28 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin, 
 
   @override
   Widget build(BuildContext context) {
+    const List<NavigationDestination> destinations = [
+      NavigationDestination(label: 'Inbox', icon: Icon(Icons.inbox, color: Colors.black)),
+      NavigationDestination(label: 'Articles', icon: Icon(Icons.article_outlined, color: Colors.black)),
+      NavigationDestination(label: 'Chat', icon: Icon(Icons.chat_bubble_outline, color: Colors.black)),
+      NavigationDestination(label: 'Video', icon: Icon(Icons.video_call_outlined, color: Colors.black)),
+    ];
     return Scaffold(
       body: SafeArea(
         child:
 AdaptiveLayout(
   primaryNavigation: SlotLayout(
     config: {
+      0: SlotLayoutConfig(key: const Key('pnav'), builder: (_) => const SizedBox.shrink()),
       800: SlotLayoutConfig(
         inAnimation: leftOutIn,
-        key: const Key('primaryNavigation'),
-        child: SizedBox(
-          width: 75,
-          height: MediaQuery.of(context).size.height,
-          child: NavigationRail(
-            selectedIndex: 0,
-            backgroundColor: const Color.fromARGB(0, 0, 0, 0),
-            destinations: const [
-              NavigationRailDestination(icon: Icon(Icons.inbox), label: Text('Inbox')),
-              NavigationRailDestination(icon: Icon(Icons.article_outlined), label: Text('Articles')),
-              NavigationRailDestination(icon: Icon(Icons.chat_bubble_outline), label: Text('Chat')),
-              NavigationRailDestination(icon: Icon(Icons.video_call_outlined), label: Text('Video')),
-            ],
-          ),
-        ),
+        key: const Key('pnav1'),
+        builder: (_) => AdaptiveScaffold.toNavigationRail(destinations: destinations),
       ),
       1000: SlotLayoutConfig(
-        key: const Key('primaryNavigation1'),
+        key: const Key('pnav2'),
         inAnimation: leftOutIn,
-        child: SizedBox(
-          width: 150,
-          height: MediaQuery.of(context).size.height,
-          child: NavigationRail(
-            extended: true,
-            selectedIndex: 0,
-            backgroundColor: const Color.fromARGB(0, 0, 0, 0),
-            destinations: const [
-              NavigationRailDestination(icon: Icon(Icons.inbox), label: Text('Inbox')),
-              NavigationRailDestination(icon: Icon(Icons.article_outlined), label: Text('Articles')),
-              NavigationRailDestination(icon: Icon(Icons.chat_bubble_outline), label: Text('Chat')),
-              NavigationRailDestination(icon: Icon(Icons.video_call_outlined), label: Text('Video')),
-            ],
-          ),
-        ),
+        builder: (_) => AdaptiveScaffold.toNavigationRail(extended: true, destinations: destinations),
       ),
     },
   ),
@@ -129,7 +126,7 @@ AdaptiveLayout(
     config: {
       0: SlotLayoutConfig(
         key: const Key('body'),
-        child: ListView.builder(
+        builder: (_) => ListView.builder(
           itemCount: allItems.length,
           itemBuilder: (context, index) => Padding(
             padding: const EdgeInsets.all(8.0),
@@ -142,7 +139,7 @@ AdaptiveLayout(
       ),
       800: SlotLayoutConfig(
         key: const Key('body1'),
-        child:GridView.count(
+        builder: (_) => GridView.count(
           crossAxisCount: 2,
           children: allItems.map((item) => Padding(
             padding: const EdgeInsets.all(8.0),
@@ -160,24 +157,9 @@ AdaptiveLayout(
       0: SlotLayoutConfig(
         key: const Key('botnav'),
         inAnimation: bottomToTop,
-        child: BottomNavigationBar(
-          selectedItemColor: Colors.black,
-          backgroundColor: const Color.fromARGB(0, 0, 0, 0),
-          items: const [
-            BottomNavigationBarItem(label: 'Inbox', icon: Icon(Icons.inbox, color: Colors.black)),
-            BottomNavigationBarItem(label: 'Articles', icon: Icon(Icons.article_outlined, color: Colors.black)),
-            BottomNavigationBarItem(label: 'Chat', icon: Icon(Icons.chat_bubble_outline, color: Colors.black)),
-            BottomNavigationBarItem(label: 'Video', icon: Icon(Icons.video_call_outlined, color: Colors.black)),
-          ],
-        ),
+        builder: (_) => AdaptiveScaffold.toBottomNavigationBar(destinations: destinations),
       ),
-      800: const SlotLayoutConfig(
-        key: Key('botnav1'),
-        child: SizedBox(
-          height: 0,
-          width: 0,
-        ),
-      ),
+      800: SlotLayoutConfig(key: const Key('botnav1'), builder: (_) => const SizedBox.shrink()),
     },
   ),
 ),

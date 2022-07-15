@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 import 'package:flutter/widgets.dart';
-import 'slot_layout_config.dart';
 
 /// A Widget that takes a mapping of [SlotLayoutConfig]s to breakpoints and returns a chosen
 /// Widget based on the current screen size.
@@ -19,9 +18,9 @@ class SlotLayout extends StatefulWidget {
 
   /// Given a context and a config, it returns the [SlotLayoutConfig] that will
   /// be chosen from the config under the context's conditions
-  static SlotLayoutConfig? pickWidget (BuildContext context,  Map<int, SlotLayoutConfig> config){
+  static SlotLayoutConfig? pickWidget (BuildContext context,  Map<int, SlotLayoutConfig?> config){
     SlotLayoutConfig? chosenWidget;
-    config.forEach((int key, SlotLayoutConfig value) {
+    config.forEach((int key, SlotLayoutConfig? value) {
       if(MediaQuery.of(context).size.width > key){
         chosenWidget = value;
       }
@@ -32,7 +31,7 @@ class SlotLayout extends StatefulWidget {
   /// The mapping that is used to determine what Widget to display at what point.
   ///
   /// The int represents screen width.
-  final Map<int, SlotLayoutConfig> config;
+  final Map<int, SlotLayoutConfig?> config;
   @override
   State<SlotLayout> createState() => _SlotLayoutState();
 }
@@ -74,7 +73,7 @@ class _SlotLayoutState extends State<SlotLayout> with SingleTickerProviderStateM
       layoutBuilder: (Widget? currentChild, List<Widget> previousChildren) {
         final Stack elements = Stack(
           children: <Widget>[
-            if (chosenWidget?.overtakeAnimation!=null && !previousChildren.contains(currentChild)) ...previousChildren.where((Widget element) => element.key!=currentChild!.key),
+            if (chosenWidget?.outAnimation!=null && !previousChildren.contains(currentChild)) ...previousChildren.where((Widget element) => element.key!=currentChild!.key),
             if (currentChild != null) currentChild,
           ],
         );
@@ -85,10 +84,10 @@ class _SlotLayoutState extends State<SlotLayout> with SingleTickerProviderStateM
         if(child.key == chosenWidget?.key){
           return (chosenWidget?.inAnimation!=null)? chosenWidget?.inAnimation!(child, _controller)?? child : child;
         }else{
-          return (chosenWidget?.overtakeAnimation!=null)? chosenWidget?.overtakeAnimation!(child, _controller)?? child : child;
+          return (chosenWidget?.outAnimation!=null)? chosenWidget?.outAnimation!(child, _controller)?? child : child;
         }
       },
-      child:chosenWidget ?? const SlotLayoutConfig(key: Key(''), child: SizedBox(width: 0, height: 0)),
+      child: chosenWidget ?? SlotLayoutConfig(key: const Key(''), builder: (_) => const SizedBox.shrink()),
     );
   }
 }

@@ -2,9 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/widgets.dart';
-import 'slot_layout.dart';
-import 'slot_layout_config.dart';
+import 'dart:math';
+
+import 'package:flutter/material.dart';
 
 /// A parent Widget takes in multiple [SlotLayout] components and places them
 /// into their appropriate positions on the screen.
@@ -86,13 +86,14 @@ class _AdaptiveLayoutState extends State<AdaptiveLayout> with TickerProviderStat
   late AnimationController _controller;
   ValueNotifier<bool?> bodyNotifier = ValueNotifier<bool?>(false);
   late Map<String, SlotLayoutConfig?> chosenWidgets = <String, SlotLayoutConfig?>{};
+  Map<String, Size?> slotSizes = <String, Size?>{};
 
   @override
   void initState() {
-    _controller = AnimationController(
-      duration: const Duration(seconds: 1),
-      vsync: this,
-    )..forward();
+      _controller = AnimationController(
+        duration: const Duration(seconds: 1),
+        vsync: this,
+      )..forward();
     bodyNotifier.value = chosenWidgets['secondaryBody'] != null;
     bodyNotifier.addListener(() {
       if (bodyNotifier.value ?? true) {
@@ -136,7 +137,7 @@ class _AdaptiveLayoutState extends State<AdaptiveLayout> with TickerProviderStat
     final List<Widget> entries = slots.entries
         .map((MapEntry<String, SlotLayout?> entry) {
           if (entry.value != null) {
-            return LayoutId(id: entry.key, child: entry.value ?? Container());
+            return LayoutId(id: entry.key, child: entry.value ?? const SizedBox());
           }
         })
         .whereType<Widget>()
@@ -144,13 +145,14 @@ class _AdaptiveLayoutState extends State<AdaptiveLayout> with TickerProviderStat
     bodyNotifier.value = chosenWidgets['secondaryBody'] != null;
     return CustomMultiChildLayout(
       delegate: _AdaptiveLayoutDelegate(
-        notifier: bodyNotifier,
-        controller: _controller,
         slots: slots,
+        chosenWidgets: chosenWidgets,
+        slotSizes: slotSizes,
+        controller: _controller,
+        notifier: bodyNotifier,
         bodyRatio: widget.bodyRatio,
         bodyAnimated: widget.bodyAnimated,
         horizontalBody: widget.horizontalBody,
-        chosenWidgets: chosenWidgets,
         textDirection: Directionality.of(context) == TextDirection.ltr,
       ),
       children: entries,
@@ -162,23 +164,26 @@ class _AdaptiveLayoutState extends State<AdaptiveLayout> with TickerProviderStat
 class _AdaptiveLayoutDelegate extends MultiChildLayoutDelegate {
   _AdaptiveLayoutDelegate({
     required this.slots,
-    required this.bodyRatio,
+    required this.chosenWidgets,
+    required this.slotSizes,
     required this.controller,
     required this.notifier,
+    required this.bodyRatio,
     required this.bodyAnimated,
     required this.horizontalBody,
-    required this.chosenWidgets,
     required this.textDirection,
   }) : super(relayout: controller);
 
   final Map<String, SlotLayout?> slots;
-  final double? bodyRatio;
+  final Map<String, SlotLayoutConfig?> chosenWidgets;
+  final Map<String, Size?> slotSizes;
   final AnimationController controller;
   final ValueNotifier<bool?> notifier;
+  final double? bodyRatio;
   final bool bodyAnimated;
   final bool horizontalBody;
   final bool textDirection;
-  final Map<String, SlotLayoutConfig?> chosenWidgets;
+
 
   @override
   void performLayout(Size size) {

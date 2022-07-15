@@ -16,14 +16,14 @@ class SlotLayoutConfig extends StatefulWidget {
   /// Returns the child widget as is but holds properties to be accessed by other
   /// classes.
   const SlotLayoutConfig({
-    required this.child,
+    required this.builder,
     this.inAnimation,
     this.overtakeAnimation,
     required super.key,
   });
 
   /// The child Widget that the parent eventually returns with an animation.
-  final Widget child;
+  final WidgetBuilder builder;
 
   /// A function that takes an [AnimationController] and a [Widget] and returns
   /// a [Widget].
@@ -51,6 +51,6 @@ class SlotLayoutConfig extends StatefulWidget {
 class _SlotLayoutConfigState extends State<SlotLayoutConfig> {
   @override
   Widget build(BuildContext context) {
-    return widget.child;
+    return widget.builder(context);
   }
 }

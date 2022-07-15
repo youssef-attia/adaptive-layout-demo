@@ -1,4 +1,3 @@
-import 'package:adaptive_layout_api/adaptive_scaffold.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -12,57 +11,37 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.deepPurple,
-      ),
       home:
-      AdaptiveScaffold(
-        breakpoints: const [0, 500, 1000],
-        selectedIndex: 0,
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.inbox), label: 'hello'),
-          NavigationDestination(icon: Icon(Icons.article), label: 'hello1'),
-          NavigationDestination(icon: Icon(Icons.chat), label: 'hello2'),
-          NavigationDestination(icon: Icon(Icons.video_call), label: 'hello3'),
-        ],
-        bodyList: [
-          ListView.builder(
-            itemCount: allItems.length,
-            itemBuilder: (context, index) => Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                height: 250,
-                color: Colors.red,
-              ),
-            ),
-          ),
-          ListView.builder(
-            itemCount: allItems.length,
-            itemBuilder: (context, index) => Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                height: 50,
-                color: Colors.red,
-              ),
-            ),
-          )
-          ,null
-        ],
-        secondaryBodyList: [
-          null,
-          ListView.builder(
-            itemCount: allItems.length,
-            itemBuilder: (context, index) => Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                height: 50,
-                color: Colors.red,
-              ),
-            ),
-          ),
-          null,
-        ],
-      )
+AdaptiveScaffold(
+  breakpoints: const [0, 500, 1000],
+  selectedIndex: 0,
+  destinations: const [
+    NavigationDestination(icon: Icon(Icons.inbox), label: 'Inbox'),
+    NavigationDestination(icon: Icon(Icons.article), label: 'Articles'),
+    NavigationDestination(icon: Icon(Icons.chat), label: 'Chat'),
+    NavigationDestination(icon: Icon(Icons.video_call), label: 'Video'),
+  ],
+  smallBody: (_) => ListView.builder(
+    itemCount: allItems.length,
+    itemBuilder: (context, index) => Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Container(
+        height: 250,
+        color: const Color.fromARGB(255, 255, 201, 197),
+      ),
+    ),
+  ),
+  body: (_) => GridView.count(
+    crossAxisCount: 2,
+    children: allItems.map((item) => Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Container(
+        color: const Color.fromARGB(255, 255, 201, 197),
+        height: 400,
+      ),
+    )).toList(),
+  ),
+),
     );
   }
 }
