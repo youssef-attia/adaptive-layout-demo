@@ -69,33 +69,33 @@ class MyApp extends StatelessWidget {
         child: MaterialApp(
               home: AdaptiveLayout(
                 primaryNavigation: SlotLayout(
-                  config: <int, SlotLayoutConfig?>{
-                    900: SlotLayoutConfig(key: const Key('800'), builder: on1),
+                  config: <Breakpoint, SlotLayoutConfig?>{
+                    Breakpoints.medium: SlotLayoutConfig(key: const Key('800'), builder: on1),
                   },
                 ),
                 secondaryNavigation: SlotLayout(
-                  config: <int, SlotLayoutConfig>{
-                    800: SlotLayoutConfig(key: const Key('snav1'), builder: on),
+                  config: <Breakpoint, SlotLayoutConfig>{
+                    Breakpoints.medium: SlotLayoutConfig(key: const Key('snav1'), builder: on),
                   },
                 ),
                 topNavigation: SlotLayout(
-                  config: <int, SlotLayoutConfig>{
-                    800: SlotLayoutConfig(key: const Key('tnav1'), builder: on),
+                  config: <Breakpoint, SlotLayoutConfig>{
+                    Breakpoints.medium: SlotLayoutConfig(key: const Key('tnav1'), builder: on),
                   },
                 ),
                 bottomNavigation: SlotLayout(
-                  config: <int, SlotLayoutConfig>{
-                    800: SlotLayoutConfig(key: const Key('bnav1'), builder: on),
+                  config: <Breakpoint, SlotLayoutConfig>{
+                    Breakpoints.medium: SlotLayoutConfig(key: const Key('bnav1'), builder: on),
                   },
                 ),
                 body: SlotLayout(
-                  config: <int, SlotLayoutConfig>{
-                    0: SlotLayoutConfig(key: const Key('b1'), builder: (_) => Container(color: Colors.red,)),
+                  config: <Breakpoint, SlotLayoutConfig>{
+                    Breakpoints.standard: SlotLayoutConfig(key: const Key('b1'), builder: (_) => Container(color: Colors.red,)),
                   },
                 ),
                 secondaryBody: SlotLayout(
-                  config: <int, SlotLayoutConfig>{
-                    800: SlotLayoutConfig(key: const Key('sb1'), builder: (_) => Container(color: Colors.blue,)),
+                  config: <Breakpoint, SlotLayoutConfig>{
+                    Breakpoints.medium: SlotLayoutConfig(key: const Key('sb1'), builder: (_) => Container(color: Colors.blue,)),
                   },
                 ),
               ),

@@ -109,13 +109,13 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin, 
 AdaptiveLayout(
   primaryNavigation: SlotLayout(
     config: {
-      0: SlotLayoutConfig(key: const Key('pnav'), builder: (_) => const SizedBox.shrink()),
-      800: SlotLayoutConfig(
+      Breakpoints.small: SlotLayoutConfig(key: const Key('pnav'), builder: (_) => const SizedBox.shrink()),
+      Breakpoints.medium: SlotLayoutConfig(
         inAnimation: leftOutIn,
         key: const Key('pnav1'),
         builder: (_) => AdaptiveScaffold.toNavigationRail(destinations: destinations),
       ),
-      1000: SlotLayoutConfig(
+      Breakpoints.large: SlotLayoutConfig(
         key: const Key('pnav2'),
         inAnimation: leftOutIn,
         builder: (_) => AdaptiveScaffold.toNavigationRail(extended: true, destinations: destinations),
@@ -124,7 +124,7 @@ AdaptiveLayout(
   ),
   body: SlotLayout(
     config: {
-      0: SlotLayoutConfig(
+      Breakpoints.small: SlotLayoutConfig(
         key: const Key('body'),
         builder: (_) => ListView.builder(
           itemCount: allItems.length,
@@ -137,7 +137,7 @@ AdaptiveLayout(
           ),
         ),
       ),
-      800: SlotLayoutConfig(
+      Breakpoints.medium: SlotLayoutConfig(
         key: const Key('body1'),
         builder: (_) => GridView.count(
           crossAxisCount: 2,
@@ -154,12 +154,12 @@ AdaptiveLayout(
   ),
   bottomNavigation: SlotLayout(
     config: {
-      0: SlotLayoutConfig(
+      Breakpoints.small: SlotLayoutConfig(
         key: const Key('botnav'),
         inAnimation: bottomToTop,
         builder: (_) => AdaptiveScaffold.toBottomNavigationBar(destinations: destinations),
       ),
-      800: SlotLayoutConfig(key: const Key('botnav1'), builder: (_) => const SizedBox.shrink()),
+      Breakpoints.medium: SlotLayoutConfig(key: const Key('botnav1'), builder: (_) => const SizedBox.shrink()),
     },
   ),
 ),

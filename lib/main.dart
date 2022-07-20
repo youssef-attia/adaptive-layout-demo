@@ -192,10 +192,10 @@ AnimatedWidget rightOutIn(Widget child, animation) {
             child: AdaptiveLayout(
               primaryNavigation: SlotLayout(
                 config: {
-                  800: SlotLayoutConfig(
+                  Breakpoints.medium: SlotLayoutConfig(
                     key: const Key('primaryNavigation'),
                     builder: (_) => SizedBox(
-                      width: 75,
+                      width: 72,
                       height: MediaQuery.of(context).size.height,
                       child: NavigationRail(
                         onDestinationSelected: (int index) {
@@ -251,7 +251,7 @@ AnimatedWidget rightOutIn(Widget child, animation) {
                       ),
                     ),
                   ),
-                  1000: SlotLayoutConfig(
+                  Breakpoints.large: SlotLayoutConfig(
                     key: const Key('primaryNavigation1'),
                     inAnimation: leftOutIn,
                     builder:(_) => AdaptiveScaffold.toNavigationRail(
@@ -296,11 +296,11 @@ AnimatedWidget rightOutIn(Widget child, animation) {
               ),
               body: SlotLayout(
                 config: {
-                  0: SlotLayoutConfig(
+                  Breakpoints.standard: SlotLayoutConfig(
                     key: const Key('body'),
                     builder: (_) =>
                     (_selectedIndex==0)?Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 32, 16, 0),
+                      padding: const EdgeInsets.fromLTRB(0, 32, 0, 0),
                       child: ItemList(items: allItems, selectCard: selectCard, setDisplayed: setDisplayed, showGridView: false),
                     ):const ExamplePage(),
                   ),
@@ -308,18 +308,18 @@ AnimatedWidget rightOutIn(Widget child, animation) {
               ),
               secondaryBody: _selectedIndex==0? SlotLayout(
                 config: {
-                  800: SlotLayoutConfig(outAnimation: stayOnScreen, key: const Key('sb1'), builder: (_) => DetailTile(item: allItems[selected ?? 0])),
+                  Breakpoints.medium: SlotLayoutConfig(outAnimation: stayOnScreen, key: const Key('sb1'), builder: (_) => DetailTile(item: allItems[selected ?? 0])),
+                  Breakpoints.large: SlotLayoutConfig(outAnimation: stayOnScreen, key: const Key('sb1'), builder: (_) => DetailTile(item: allItems[selected ?? 0])),
                 },
               ):null,
               bottomNavigation: SlotLayout(
                 config: {
-                  0: SlotLayoutConfig(
+                  Breakpoints.small: SlotLayoutConfig(
                     key: const Key('bn'),
                     inAnimation: bottomToTop,
                     outAnimation: topToBottom,
                     builder:(_) => AdaptiveScaffold.toBottomNavigationBar(destinations: destinations),
                   ),
-                  800: SlotLayoutConfig.empty(),
                 },
               ),
             ),

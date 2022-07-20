@@ -13,7 +13,6 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       home:
 AdaptiveScaffold(
-  breakpoints: const [0, 500, 1000],
   selectedIndex: 0,
   destinations: const [
     NavigationDestination(icon: Icon(Icons.inbox), label: 'Inbox'),

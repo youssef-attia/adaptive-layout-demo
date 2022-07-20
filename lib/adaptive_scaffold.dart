@@ -15,9 +15,9 @@ class AdaptiveScaffold extends StatefulWidget {
     this.secondaryBody,
     this.largeSecondaryBody,
     this.bodyRatio,
-    this.breakpoints = const <int>[0, 480, 1024],
-    this.displayAnimations = true,
-    this.bodyAnimated = true,
+    this.breakpoints = const <Breakpoint>[Breakpoints.small, Breakpoints.medium, Breakpoints.large],
+    this.offsetAnimations = true,
+    this.internalAnimations = true,
     this.horizontalBody = true,
     super.key,
   });
@@ -85,18 +85,18 @@ class AdaptiveScaffold extends StatefulWidget {
   /// until the value at the next index.
   ///
   /// Defaults to [0, 480, 1024].
-  final List<int> breakpoints;
+  final List<Breakpoint> breakpoints;
 
   /// Whether or not the developer wants display animations.
   ///
   /// Defaults to true.
-  final bool displayAnimations;
+  final bool offsetAnimations;
 
   /// Whether or not the developer wants the smooth entering slide transition on
   /// secondaryBody.
   ///
   /// Defaults to true.
-  final bool bodyAnimated;
+  final bool internalAnimations;
 
   /// Whether to orient the body and secondaryBody in horizontal order (true) or
   /// in vertical order (false).
@@ -108,27 +108,43 @@ class AdaptiveScaffold extends StatefulWidget {
   /// list of [NavigationDestination]s. Takes in a [selectedIndex] property for
   /// the current selected item in the [NavigationRail] and [extended] for
   /// whether the [NavigationRail] is extended or not.
-  static NavigationRail toNavigationRail(
-      {required List<NavigationDestination> destinations,
-      int selectedIndex = 0,
-      bool extended = false,
-      Color backgroundColor = Colors.transparent,
-      Widget? leading,
-      Widget? trailing}) {
-    return NavigationRail(
-      leading: leading,
-      trailing: trailing,
-      backgroundColor: backgroundColor,
-      extended: extended,
-      selectedIndex: selectedIndex,
-      destinations: <NavigationRailDestination>[
-        for (NavigationDestination destination in destinations)
-          NavigationRailDestination(
-            label: Text(destination.label),
-            icon: destination.icon,
-          )
-      ],
-    );
+  static Builder toNavigationRail({
+    required List<NavigationDestination> destinations,
+    double width = 72,
+    int selectedIndex = 0,
+    bool extended = false,
+    Color backgroundColor = Colors.transparent,
+    Widget? leading,
+    Widget? trailing,
+    NavigationRailLabelType labelType = NavigationRailLabelType.none,
+  }) {
+    if (extended && width == 72) {
+      width = 150;
+    }
+    return Builder(builder: (BuildContext context) {
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: SizedBox(
+          width: width,
+          height: MediaQuery.of(context).size.height,
+          child: NavigationRail(
+            labelType: labelType,
+            leading: leading,
+            trailing: trailing,
+            backgroundColor: backgroundColor,
+            extended: extended,
+            selectedIndex: selectedIndex,
+            destinations: <NavigationRailDestination>[
+              for (NavigationDestination destination in destinations)
+                NavigationRailDestination(
+                  label: Text(destination.label),
+                  icon: destination.icon,
+                )
+            ],
+          ),
+        ),
+      );
+    });
   }
 
   /// Public helper method to be used for creating a [BottomNavigationBar] from
@@ -150,13 +166,8 @@ class AdaptiveScaffold extends StatefulWidget {
     );
   }
 
-  @override
-  State<AdaptiveScaffold> createState() => _AdaptiveScaffoldState();
-}
-
-
-class _AdaptiveScaffoldState extends State<AdaptiveScaffold> {
-  AnimatedWidget bottomToTop(Widget child, AnimationController animation) {
+  /// Animation from bottom offscreen up onto the screen.
+  static AnimatedWidget bottomToTop(Widget child, AnimationController animation) {
     return SlideTransition(
       position: Tween<Offset>(
         begin: const Offset(0, 1),
@@ -166,7 +177,8 @@ class _AdaptiveScaffoldState extends State<AdaptiveScaffold> {
     );
   }
 
-  AnimatedWidget topToBottom(Widget child, AnimationController animation) {
+  /// Animation from on the screen down off the screen.
+  static AnimatedWidget topToBottom(Widget child, AnimationController animation) {
     return SlideTransition(
       position: Tween<Offset>(
         begin: Offset.zero,
@@ -176,7 +188,8 @@ class _AdaptiveScaffoldState extends State<AdaptiveScaffold> {
     );
   }
 
-  AnimatedWidget leftOutIn(Widget child, AnimationController animation) {
+  /// Animation from left off the screen into the screen.
+  static AnimatedWidget leftOutIn(Widget child, AnimationController animation) {
     return SlideTransition(
       position: Tween<Offset>(
         begin: const Offset(-1, 0),
@@ -186,7 +199,8 @@ class _AdaptiveScaffoldState extends State<AdaptiveScaffold> {
     );
   }
 
-  AnimatedWidget leftInOut(Widget child, AnimationController animation) {
+  /// Animation from on screen to left off screen.
+  static AnimatedWidget leftInOut(Widget child, AnimationController animation) {
     return SlideTransition(
       position: Tween<Offset>(
         begin: Offset.zero,
@@ -196,7 +210,8 @@ class _AdaptiveScaffoldState extends State<AdaptiveScaffold> {
     );
   }
 
-  AnimatedWidget rightOutIn(Widget child, AnimationController animation) {
+  /// Animation from right off screen to on screen.
+  static AnimatedWidget rightOutIn(Widget child, AnimationController animation) {
     return SlideTransition(
       position: Tween<Offset>(
         begin: const Offset(1, 0),
@@ -206,27 +221,43 @@ class _AdaptiveScaffoldState extends State<AdaptiveScaffold> {
     );
   }
 
-  Widget fadeIn(Widget child, AnimationController animation) {
+  /// Fade in animation.
+  static Widget fadeIn(Widget child, AnimationController animation) {
     return FadeTransition(
       opacity: CurvedAnimation(parent: animation, curve: Curves.easeInCubic),
       child: child,
     );
   }
 
-  Widget fadeOut(Widget child, AnimationController animation) {
+  /// Fade out animation.
+  static Widget fadeOut(Widget child, AnimationController animation) {
     return FadeTransition(
       opacity: CurvedAnimation(parent: ReverseAnimation(animation), curve: Curves.easeInCubic),
       child: child,
     );
   }
   @override
+  State<AdaptiveScaffold> createState() => _AdaptiveScaffoldState();
+}
+
+
+class _AdaptiveScaffoldState extends State<AdaptiveScaffold> {
+  @override
   Widget build(BuildContext context) {
-    List<WidgetBuilder?>? bodyList = <WidgetBuilder?>[widget.smallBody ?? widget.body, widget.body, widget.largeBody ?? widget.body];
-    List<WidgetBuilder?>? secondaryBodyList = <WidgetBuilder?>[widget.smallSecondaryBody ?? widget.secondaryBody, widget.secondaryBody, widget.largeSecondaryBody ?? widget.secondaryBody];
-    if(bodyList.every((WidgetBuilder? e) => e==null)) {
+    List<WidgetBuilder?>? bodyList = <WidgetBuilder?>[
+      widget.smallBody ?? widget.body,
+      widget.body,
+      widget.largeBody ?? widget.body
+    ];
+    List<WidgetBuilder?>? secondaryBodyList = <WidgetBuilder?>[
+      widget.smallSecondaryBody ?? widget.secondaryBody,
+      widget.secondaryBody,
+      widget.largeSecondaryBody ?? widget.secondaryBody
+    ];
+    if (bodyList.every((WidgetBuilder? e) => e == null)) {
       bodyList = null;
     }
-    if(secondaryBodyList.every((WidgetBuilder? e) => e==null)) {
+    if (secondaryBodyList.every((WidgetBuilder? e) => e == null)) {
       secondaryBodyList = null;
     }
 
@@ -235,20 +266,12 @@ class _AdaptiveScaffoldState extends State<AdaptiveScaffold> {
       child: AdaptiveLayout(
         horizontalBody: widget.horizontalBody,
         bodyRatio: widget.bodyRatio,
-        internalAnimations: widget.bodyAnimated && widget.displayAnimations,
+        internalAnimations: widget.internalAnimations && widget.offsetAnimations,
         primaryNavigation: widget.destinations != null && widget.selectedIndex != null
             ? SlotLayout(
-                config: <int, SlotLayoutConfig>{
+                config: <Breakpoint, SlotLayoutConfig>{
                   widget.breakpoints[0]: SlotLayoutConfig(
-                    outAnimation: widget.displayAnimations ? leftInOut : null,
-                    key: const Key('primaryNavigation0'),
-                    builder: (_) => const SizedBox(
-                      width: 0,
-                      height: 0,
-                    ),
-                  ),
-                  widget.breakpoints[1]: SlotLayoutConfig(
-                    inAnimation: widget.displayAnimations ? leftOutIn : null,
+                    inAnimation: widget.offsetAnimations ? AdaptiveScaffold.leftOutIn : null,
                     key: const Key('primaryNavigation1'),
                     builder: (_) => SizedBox(
                       width: 75,
@@ -259,8 +282,8 @@ class _AdaptiveScaffoldState extends State<AdaptiveScaffold> {
                       ),
                     ),
                   ),
-                  widget.breakpoints[2]: SlotLayoutConfig(
-                    inAnimation: widget.displayAnimations ? leftOutIn : null,
+                  widget.breakpoints[1]: SlotLayoutConfig(
+                    inAnimation: widget.offsetAnimations ? AdaptiveScaffold.leftOutIn : null,
                     key: const Key('primaryNavigation2'),
                     builder: (_) => SizedBox(
                       width: 150,
@@ -277,20 +300,15 @@ class _AdaptiveScaffoldState extends State<AdaptiveScaffold> {
             : null,
         bottomNavigation: widget.destinations != null && widget.selectedIndex != null
             ? SlotLayout(
-                config: <int, SlotLayoutConfig>{
+                config: <Breakpoint, SlotLayoutConfig>{
                   widget.breakpoints[0]: SlotLayoutConfig(
-                    inAnimation: widget.displayAnimations ? bottomToTop : null,
+                    inAnimation: widget.offsetAnimations ? AdaptiveScaffold.bottomToTop : null,
                     key: const Key('botnav1'),
                     builder: (_) => BottomNavigationBar(
                       unselectedItemColor: Colors.grey,
                       selectedItemColor: Colors.black,
                       items: widget.destinations!.map(_toBottomNavItem).toList(),
                     ),
-                  ),
-                  widget.breakpoints[1]: SlotLayoutConfig(
-                    outAnimation: widget.displayAnimations ? topToBottom : null,
-                    key: const Key('botnavnone'),
-                    builder: (_) => const SizedBox(width: 0, height: 0),
                   ),
                 },
               )
@@ -304,15 +322,15 @@ class _AdaptiveScaffoldState extends State<AdaptiveScaffold> {
   SlotLayout? _createSlotFromProperties(List<WidgetBuilder?>? list, String name) {
     return list != null
         ? SlotLayout(
-            config: <int, SlotLayoutConfig?>{
+            config: <Breakpoint, SlotLayoutConfig?>{
               for (MapEntry<int, WidgetBuilder?> entry in list.asMap().entries)
                 if (entry.key == 0 || list[entry.key] != list[entry.key - 1])
                   widget.breakpoints[entry.key]: (entry.value != null)
                       ? SlotLayoutConfig(
                           key: Key('$name${entry.key}'),
-                          inAnimation: fadeIn,
-                          outAnimation: fadeOut,
-                          builder: entry.value!,
+                          inAnimation: AdaptiveScaffold.fadeIn,
+                          outAnimation: AdaptiveScaffold.fadeOut,
+                          builder: entry.value,
                         )
                       : null
             },
